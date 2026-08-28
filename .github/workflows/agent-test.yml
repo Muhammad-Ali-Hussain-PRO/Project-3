@@ -1,0 +1,24 @@
+name: ChronosAI Agent Execution Sandbox
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  execute-agent-loop:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code Repository Base
+        uses: actions/checkout@v4
+
+      - name: Configure Runtime Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Execute Live Multi-Agent Simulation Matches
+        run: python main.py
