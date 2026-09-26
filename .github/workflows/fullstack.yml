@@ -1,0 +1,52 @@
+name: Full-stack scheduling checks
+on:
+  push:
+    paths: ['fullstack/**', '.github/workflows/fullstack.yml']
+  pull_request:
+    paths: ['fullstack/**', '.github/workflows/fullstack.yml']
+permissions:
+  contents: read
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        storage: [sqlite, postgres]
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: chronos
+          POSTGRES_PASSWORD: test-only-local-ci
+          POSTGRES_DB: chronos
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U chronos -d chronos"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r fullstack/backend/requirements-dev.txt
+      - name: SQLite integration suite
+        if: matrix.storage == 'sqlite'
+        working-directory: fullstack
+        run: python -m pytest backend/tests -q
+      - name: PostgreSQL integration suite
+        if: matrix.storage == 'postgres'
+        working-directory: fullstack
+        env:
+          TEST_DATABASE_URL: postgresql://chronos:test-only-local-ci@localhost:5432/chronos
+        run: python -m pytest backend/tests -q
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: fullstack/frontend/package-lock.json
+      - run: npm ci && npm test && npm run test:ui && npm run build
+        working-directory: fullstack/frontend

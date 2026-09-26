@@ -1,5 +1,15 @@
 # ChronosAI Scheduler
 
+## New full-stack workspace
+
+The `applied-engineering-upgrade` branch adds an AI-assisted React + Python FastAPI workspace with PostgreSQL/SQLite persistence, conflict previews, explicit confirmation, idempotent booking and automated integration checks.
+
+- [Open the browser demo](https://muhammad-ali-hussain-engineering.muhammadalifarhanhus.chatgpt.site/projects/chronos/)
+- [Run the Python and database version](fullstack/README.md)
+- [Architecture and implementation walkthrough](fullstack/docs/ARCHITECTURE.md)
+
+The hosted demo uses local browser storage. The API/database version is runnable from source. The original command-line example below remains available.
+
 ChronosAI Scheduler is a compact Python demonstration of an agentic calendar
 workflow. It turns natural-language requests into scheduled events, evaluates
 overlap boundaries against calendar memory, and moves conflicting meetings to

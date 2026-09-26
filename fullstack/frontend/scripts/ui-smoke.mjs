@@ -1,0 +1,14 @@
+import {JSDOM} from 'jsdom';import {readFileSync,readdirSync} from 'node:fs';import {execFileSync} from 'node:child_process';import assert from 'node:assert/strict';
+execFileSync(process.execPath,['node_modules/vite/bin/vite.js','build'],{env:{...process.env,VITE_DEMO:'true'},stdio:'pipe'});
+const bundle=readdirSync('dist/assets').find(x=>x.endsWith('.js'));
+const dom=new JSDOM('<div id="root"></div>',{url:'https://chronos.example/',runScripts:'outside-only',pretendToBeVisual:true});
+const w=dom.window;w.eval(readFileSync('dist/assets/'+bundle,'utf8'));
+const wait=()=>new Promise(r=>setTimeout(r,70));await wait();
+const d=w.document;assert.match(d.body.textContent,/BROWSER DEMO/);assert.equal(d.querySelectorAll('.event').length,2);
+d.querySelector('form').dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await wait();
+assert.match(d.querySelector('.result').textContent,/Your next opening/);assert.match(d.querySelector('.reason').textContent,/Project planning/);
+d.querySelector('.result button').click();await wait();assert.equal(d.querySelectorAll('.event').length,3);assert.match(d.body.textContent,/Event booked/);
+d.querySelector('.event-detail .text-button').click();await wait();d.querySelector('.delete-confirm button').click();await wait();assert.equal(d.querySelectorAll('.event').length,2);
+d.querySelector('.reset').click();await wait();assert.equal(d.querySelectorAll('.event').length,2);assert.match(d.body.textContent,/Sample agenda restored/);
+for(const field of d.querySelectorAll('input,select'))assert.ok(d.querySelector('label[for="'+field.id+'"]'));
+console.log('React DOM flow passed: seeded agenda, conflict preview, confirmation, deletion, reset, labels.');w.close();

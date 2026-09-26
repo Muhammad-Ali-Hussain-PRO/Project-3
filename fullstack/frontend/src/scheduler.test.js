@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {firstAvailable,overlaps,localInstant} from './scheduler.js';
+const m=60000;const event=(start,end,title='Busy')=>({start:start*m,end:end*m,title});
+test('fits before an existing event including an equal boundary',()=>assert.equal(firstAvailable(0,180*m,30,[event(30,90)]).start,0));
+test('jumps through overlapping and nested events',()=>{const s=firstAvailable(10*m,200*m,30,[event(30,90),event(20,40),event(80,100)]);assert.equal(s.start,100*m);assert.equal(s.conflicts.length,3);});
+test('rejects a slot beyond the window',()=>assert.equal(firstAvailable(0,50*m,60,[]),null));
+test('ignores events ending at the requested start',()=>assert.equal(firstAvailable(50*m,200*m,30,[event(0,50)]).start,50*m));
+test('overlap excludes adjacent boundaries',()=>{assert.equal(overlaps(event(0,30),event(30,60)),false);assert.equal(overlaps(event(0,31),event(30,60)),true);});
+test('does not mutate event ordering',()=>{const events=[event(90,100),event(10,20)];firstAvailable(0,180*m,30,events);assert.equal(events[0].start,90*m);});
+test('validates interval inputs',()=>assert.throws(()=>firstAvailable(40,20,30,[])));
+test('rejects invalid local date',()=>assert.throws(()=>localInstant('2026-02-30','09:00')));
