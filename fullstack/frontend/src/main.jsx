@@ -5,7 +5,7 @@ import {localInstant} from './scheduler';
 import './style.css';
 const SITE='https://muhammad-ali-hussain-engineering.muhammadalifarhanhus.chatgpt.site';
 const time=n=>new Intl.DateTimeFormat(undefined,{hour:'numeric',minute:'2-digit'}).format(n);
-const longDay=d=>new Intl.DateTimeFormat(undefined,{weekday:'long',month:'short',day:'numeric'}).format(new Date(d+'T12:00:00'));
+const longDay=d=>d?new Intl.DateTimeFormat(undefined,{weekday:'long',month:'short',day:'numeric'}).format(new Date(d+'T12:00:00')):'Choose a day';
 const zone=Intl.DateTimeFormat().resolvedOptions().timeZone;
 function App(){
  const [events,setEvents]=useState([]),[date,setDate]=useState(dayString()),[title,setTitle]=useState('Project focus session'),[earliest,setEarliest]=useState('09:00'),[latest,setLatest]=useState('17:00'),[duration,setDuration]=useState(60),[slot,setSlot]=useState(null),[busy,setBusy]=useState(true),[error,setError]=useState(''),[notice,setNotice]=useState(''),[deleteId,setDeleteId]=useState(null);
